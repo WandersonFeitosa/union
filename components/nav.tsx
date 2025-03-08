@@ -9,6 +9,7 @@ import { Boxes } from "lucide-react"
 
 const routes = [
   { name: "Home", path: "/" },
+  { name: "Schedule", path: "/schedule" },
   { name: "Dashboard", path: "/dashboard" },
   { name: "Projects", path: "/projects" },
   { name: "Settings", path: "/settings" },

@@ -40,12 +40,99 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+enum WowClass {
+  WARLOCK
+  WARRIOR
+  DRUID
+  HUNTER
+  MAGE
+  PALADIN
+  ROGUE
+  SHAMAN
+  PRIEST
+}
+
+model Character {
+  id        String   @id @default(cuid())
+  name      String
+  class     WowClass
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  runPlayer RunPlayer[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  isCarrier     Boolean   @default(false)
+  characters    Character[]
   accounts      Account[]
   sessions      Session[]
+  runPlayers    RunPlayer[]
+  runsCreated   Run[]     @relation("CreatedRuns")
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  name        String
+  price       Int      // Price in gold
+  imageUrl    String?
+  reservations Reservation[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Run {
+  id          String   @id @default(cuid())
+  datetime    DateTime
+  dungeon     String
+  status      RunStatus @default(SCHEDULED)
+  createdById String
+  createdBy   User     @relation("CreatedRuns", fields: [createdById], references: [id])
+  leaderId    String?
+  players     RunPlayer[]
+  reservations Reservation[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum RunStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model RunPlayer {
+  id          String   @id @default(cuid())
+  runId       String
+  userId      String
+  characterId String
+  isLeader    Boolean  @default(false)
+  isCarrier   Boolean
+  run         Run      @relation(fields: [runId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+  character   Character @relation(fields: [characterId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([runId, userId])
+}
+
+model Reservation {
+  id          String   @id @default(cuid())
+  runId       String
+  itemId      String
+  userId      String
+  run         Run      @relation(fields: [runId], references: [id])
+  item        Item     @relation(fields: [itemId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([runId, itemId, userId])
 }
