@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "ts-node scripts/seed.ts"
+    
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.8.0",
